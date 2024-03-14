@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - ./frontend/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    networks:
+      - web
+  backend:
+    image: node:20
+    volumes:
+      - ./backend/app.js:/backend/app.js
+      - ./backend/package.json:/backend/package.json
+    command: bash -c 'cd /backend && npm install && npm start'
+    depends_on:
+      - db
+    networks:
+      - web
+      - database
+  db:
+    image: mongo:3.4
+    networks:
+      - database
+networks:
+  web:
+  database:
